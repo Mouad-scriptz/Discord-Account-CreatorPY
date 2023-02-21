@@ -1,5 +1,5 @@
 captcha:
-  key: "CAI-85DF7205C58A18BE4D1AD4D4318D9673"
+  key: ""
   provider: "capsolver.com" # Or capmonster.cloud, more soon
   site_key: "4c672d35-0701-42b2-88c3-78380b0db560" # Changes 1-2 times a year
 
