@@ -4,7 +4,7 @@ captcha:
   site_key: "4c672d35-0701-42b2-88c3-78380b0db560" # Changes 1-2 times a year
 
 settings:
-  rotating-proxy: "novamium:fucker69410_country-us_streaming-1@geo.iproyal.com:12321" # username:password@host:port
+  rotating-proxy: "" # username:password@host:port
   discord_build_number: 175517
 
 token:
