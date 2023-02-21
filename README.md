@@ -23,4 +23,4 @@
 + Discord server: https://discord.gg/Tct8fUVnZm
 + My discord: Mouad#9475
 # Preview
-!(https://cdn.discordapp.com/attachments/1077576500355809323/1077689292702367754/image.png)
+![](https://cdn.discordapp.com/attachments/1077576500355809323/1077689292702367754/image.png)
