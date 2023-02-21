@@ -1,5 +1,5 @@
 # Discord-Account-CreatorPY
-(open-source) The revive of discord token generators, with latest discord patches including tls fingerprinting
+(open-source) (WIP) The revive of discord token generators, with latest discord patches including tls fingerprinting
 
 # Features
 + Threading
@@ -19,4 +19,7 @@
 # Warning
 + You have 0 right to skid this project without permission.
 
+# Support
++ Discord server: https://discord.gg/Tct8fUVnZm
++ My discord: Mouad#9475
 # Preview
