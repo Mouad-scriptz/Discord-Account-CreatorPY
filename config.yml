@@ -1,0 +1,11 @@
+captcha:
+  key: "CAI-85DF7205C58A18BE4D1AD4D4318D9673"
+  provider: "capsolver.com" # Or capmonster.cloud, more soon
+  site_key: "4c672d35-0701-42b2-88c3-78380b0db560" # Changes 1-2 times a year
+
+settings:
+  rotating-proxy: "novamium:fucker69410_country-us_streaming-1@geo.iproyal.com:12321" # username:password@host:port
+  discord_build_number: 175517
+
+token:
+  username: "" # Leave empty for random
