@@ -5,7 +5,7 @@ key = config["captcha"]["key"]
 service = config["captcha"]["provider"]
 def get_balance():
     try:
-        r = requests.get(f"https://api.{service}/getBalance",json={"clientKey":key})
+        r = requests.post(f"https://api.{service}/getBalance",json={"clientKey":key})
         if r.json().get("balance"):
             return r.json()["balance"]
         else:

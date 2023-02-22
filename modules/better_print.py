@@ -1,36 +1,43 @@
+import threading
 from colorama import Fore, init
+
 init(convert=True)
+print_lock = threading.Lock()
+
+def print_with_lock(text):
+    print_lock.acquire()
+    print(text)
+    print_lock.release()
 
 def info(text):
-    print(
+    print_with_lock(
         f"({Fore.LIGHTYELLOW_EX}*{Fore.RESET}) {Fore.YELLOW}{text}{Fore.RESET}"
     )
 def content(text, content):
-    print(
+    print_with_lock(
         f"({Fore.LIGHTGREEN_EX}+{Fore.RESET}) {text}: {Fore.GREEN}{content}{Fore.RESET}"
     )
+
 def success(text, content):
-    print(
+    print_with_lock(
         f"({Fore.LIGHTBLUE_EX}+{Fore.RESET}) {text}: {Fore.BLUE}{content}{Fore.RESET}"
     )
-
-
 def error(text):
-    print(
+    print_with_lock(
         f"({Fore.LIGHTRED_EX}-{Fore.RESET}) {Fore.LIGHTRED_EX}{text}{Fore.RESET}"
     )
-
 def fail(text):
-    print(
+    print_with_lock(
         f"({Fore.LIGHTRED_EX}-{Fore.RESET}) {Fore.RED}{text}{Fore.RESET}"
     )
+
 def cinput(text, no=None):
     if no != None:
         data = input(
-            f"({Fore.LIGHTCYAN_EX}#{Fore.RESET}) {Fore.CYAN}{text}{Fore.RESET}" 
+            f"({Fore.LIGHTCYAN_EX}~{Fore.RESET}) {Fore.CYAN}{text}{Fore.RESET}" 
         )
     else:
         data = input(
-            f"({Fore.LIGHTCYAN_EX}#{Fore.RESET}) {Fore.CYAN}{text}{Fore.RESET} >> " 
+            f"({Fore.LIGHTCYAN_EX}~{Fore.RESET}) {Fore.CYAN}{text}{Fore.RESET} >> " 
         )
     return data

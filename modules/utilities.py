@@ -1,4 +1,4 @@
-import requests, random, json, base64, pytz, yaml
+import requests, random, json, base64, pytz, yaml, threading
 from datetime import datetime
 from urllib.parse import urlencode
 
@@ -59,3 +59,15 @@ def build_oc():
         'groups': 'C0001:1,C0002:1,C0003:1'
     }
     return urlencode(data)
+open_lock = threading.Lock()
+def save_token(token, isvalid):
+    open_lock.acquire()
+    if isvalid == True:
+        valid_tokens = open("output/valid_tokens.txt","a+")
+        valid_tokens.write(token+"\n")
+        valid_tokens.close()
+    else:
+        locked_tokens = open("output/locked_tokens.txt","a+")
+        locked_tokens.write(token+"\n")
+        locked_tokens.close()
+    open_lock.release()

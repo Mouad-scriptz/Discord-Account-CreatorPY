@@ -1,11 +1,12 @@
-import os, random, secrets, yaml, threading
+import os, yaml, threading
 try:
     import tls_client, requests, colorama, urllib
 except:
     os.system("pip install tls-client requests colorama urllib")
 from modules.captcha import get_balance, get_captcha_key
-from modules.utilities import get_username, build_xtrack, build_oc
+from modules.utilities import get_username, build_xtrack, build_oc, save_token
 from modules.better_print import *
+
 class Creator():
     def __init__(self):
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
@@ -97,13 +98,38 @@ class Creator():
             }
 
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies)
-            if r.json().get("token"):
-                content("Created token",r.json()["token"])
-            else:
+            try:
+                token = r.json()["token"]
+            except:
                 Creator().register(proxy)
+                
+            try:
+                r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
+            except:
+                content("Generated UNKNOWN token",token)
+                save_token(token, False)
+            if r.status_code != 403:
+                content("Generated UNLOCKED token",token)
+                save_token(token, True)
+            else:
+                content("Generated LOCKED token",token)
+                save_token(token, False)
+            Creator().register(proxy)
         else:
             if r.json().get("token"):
-                content("Created token",r.json()["token"])
+                token = r.json()["token"]
+                try:
+                    r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
+                except:
+                    content("Generated UNKNOWN token",token)
+                    save_token(token, False)
+                if r.status_code != 403:
+                    content("Generated UNLOCKED token",token)
+                    save_token(token, True)
+                else:
+                    content("Generated LOCKED token",token)
+                    save_token(token, False)
+                Creator().register(proxy)
             else:
                 Creator().register(proxy)
 def main():
@@ -113,7 +139,7 @@ def main():
         error("No captcha key detected in config.yml")
         input("Press ENTER to exit.")
         exit(0)
-    if not config["captcha"]["provider"] in ["capmonster.cloud", "capsolver.com"]:
+    if not config["captcha"]["provider"] in ["capmonster.cloud", "capsolver.com", "anti-captcha.com"]:
         error("Unvalid captcha provider detected in config.yml (%s)".format(config["captcha"]["provider"]))
         input("Press ENTER to exit.")
         exit(0)
