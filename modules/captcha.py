@@ -14,14 +14,16 @@ def get_balance():
     except:
         fail("Failed to get captcha balance")
         return "0"
-def get_captcha_key():
+def get_captcha_key(proxy,ua):
     # Creating a task
     payload = {
         "clientKey":key,
         "task":{
-            "type": "HCaptchaTaskProxyless",
+            "type": "HCaptchaEnterpriseTask",
             "websiteURL": "https://discord.com/",
             "websiteKey": config["captcha"]["site_key"],
+            "proxy": proxy,
+            "userAgent": ua
         },
     }
     r = requests.post(f"https://api.{service}/createTask",json=payload)
