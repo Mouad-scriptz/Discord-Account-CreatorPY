@@ -4,8 +4,8 @@ try:
 except:
     os.system("pip install tls-client requests colorama urllib")
 from modules.captcha import get_balance, get_captcha_key
-from modules.utilities import get_username, build_xtrack, build_oc, save_token
-from modules.better_print import *
+from modules.utilities import get_username, build_xtrack, save_token
+from modules.better_print import console
 
 class Creator():
     def __init__(self):
@@ -23,7 +23,8 @@ class Creator():
             cert_compression_algo="brotli",
             pseudo_header_order=[":authority",":method",":path",":scheme"],
             connection_flow=15663105,
-            header_order=["accept","user-agent","accept-encoding","accept-language"]
+            header_order=["accept","user-agent","accept-encoding","accept-language"],
+            random_tls_extension_order=True
         )
 
     def register(self, proxy=None):
@@ -72,7 +73,7 @@ class Creator():
         try:
             fingerprint = r.json()["fingerprint"]
         except:
-            fail("Failed to retrieve fingerprint.")
+            console.failure("Failed to retrieve fingerprint.")
             Creator().register(proxy)
 
         # Register try 1
@@ -94,7 +95,7 @@ class Creator():
                 "consent": "true",
                 "fingerprint": fingerprint,
                 "username": username,
-                "captcha_key": get_captcha_key()
+                "captcha_key": get_captcha_key(self.ua,proxy)
             }
 
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies)
@@ -106,13 +107,13 @@ class Creator():
             try:
                 r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
             except:
-                content("Generated UNKNOWN token",token)
+                console.content("Generated UNKNOWN token",token)
                 save_token(token, False)
             if r.status_code != 403:
-                content("Generated UNLOCKED token",token)
+                console.content("Generated UNLOCKED token",token)
                 save_token(token, True)
             else:
-                content("Generated LOCKED token",token)
+                console.content("Generated LOCKED token",token)
                 save_token(token, False)
             Creator().register(proxy)
         else:
@@ -121,33 +122,33 @@ class Creator():
                 try:
                     r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
                 except:
-                    content("Generated UNKNOWN token",token)
+                    console.content("Generated UNKNOWN token",token)
                     save_token(token, False)
                 if r.status_code != 403:
-                    content("Generated UNLOCKED token",token)
+                    console.content("Generated UNLOCKED token",token)
                     save_token(token, True)
                 else:
-                    content("Generated LOCKED token",token)
+                    console.content("Generated LOCKED token",token)
                     save_token(token, False)
                 Creator().register(proxy)
             else:
                 Creator().register(proxy)
 def main():
-    info("Checking config...")
+    console.information("Checking config...")
     config = yaml.safe_load(open("config.yml"))
     if config["captcha"]["key"] == '':
-        error("No captcha key detected in config.yml")
+        console.error("No captcha key detected in config.yml")
         input("Press ENTER to exit.")
         exit(0)
     if not config["captcha"]["provider"] in ["capmonster.cloud", "capsolver.com", "anti-captcha.com"]:
-        error("Unvalid captcha provider detected in config.yml (%s)".format(config["captcha"]["provider"]))
+        console.error("Unvalid captcha provider detected in config.yml (%s)".format(config["captcha"]["provider"]))
         input("Press ENTER to exit.")
         exit(0)
     if config["settings"]["rotating-proxy"] == '':
-        error("No proxy detected in config.yml")
+        console.error("No proxy detected in config.yml")
         input("Press ENTER to exit.")
         exit(0)
-    info("Checking proxy...")
+    console.information("Checking proxy...")
     try:
         proxies = {
             "http": "http://"+config["settings"]["rotating-proxy"],
@@ -156,22 +157,22 @@ def main():
         requests.get("https://www.google.com/",proxies=proxies,timeout=3)
         proxy = config["settings"]["rotating-proxy"]
     except:
-        error("Unvalid proxy")
+        console.error("Unvalid proxy")
         input("Press ENTER to exit.")
         exit(0)
-    info("Checking captcha key...")
+    console.information("Checking captcha key...")
     if not int(get_balance()) >= .1: # capsolver.com/getbalance currently down
-        error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
+        console.error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
         answer = input("(#) Continue anyway? (Y/N) >> ")
         if answer.lower() == "n":
             exit(0)
     os.system("cls || clear")
-    threads = cinput("Threads")
+    threads = console.input("Threads")
     try:
         if int(threads) > 0:
             threads = int(threads)
     except:
-        error("Unvalid input.")
+        console.error("Unvalid input.")
     for _ in range(threads):
         threading.Thread(target=Creator().register,args=(proxy,)).start()
 main()
