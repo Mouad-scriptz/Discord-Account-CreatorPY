@@ -1,6 +1,7 @@
 import requests, random, json, base64, pytz, yaml, threading
 from datetime import datetime
 from urllib.parse import urlencode
+from modules.console import console
 
 config = yaml.safe_load(open("config.yml"))
 build_num = config["settings"]["discord_build_number"]
@@ -73,3 +74,16 @@ def save_token(token, isvalid):
         locked_tokens.write(token+"\n")
         locked_tokens.close()
     open_lock.release()
+
+def check_version():
+    try:
+        console.information("Checking generator version...")
+        current_version = requests.get("https://raw.githubusercontent.com/Mouad-scriptz/Discord-Account-CreatorPY/main/version").text.split("\n")[0]
+        local_version = open("version","r").read().splitlines()[0]
+        if current_version == local_version:
+            console.success("Using latest version",local_version)
+        else:
+            console.error(f"Using old version, current: {local_version} | latest: {current_version}")
+            input("(@) Press ENTER to exit.")
+    except:
+        console.error("Failed to check version, skipped.")
