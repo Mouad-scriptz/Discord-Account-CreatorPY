@@ -14,7 +14,7 @@ def get_balance():
     except:
         console.failure("Failed to get captcha balance")
         return "0"
-def get_captcha_key(proxy,ua):
+def get_captcha_key(ua,proxy):
     # Creating a task
     payload = {
         "clientKey":key,
