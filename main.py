@@ -5,7 +5,7 @@ except:
     os.system("pip install tls-client requests colorama urllib")
 from modules.captcha import get_balance, get_captcha_key
 from modules.utilities import get_username, build_xtrack, save_token
-from modules.better_print import console
+from modules.console import console
 
 class Creator():
     def __init__(self):
