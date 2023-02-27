@@ -4,7 +4,7 @@ try:
 except:
     os.system("pip install tls-client requests colorama urllib")
 from modules.captcha import get_balance, get_captcha_key
-from modules.utilities import get_username, build_xtrack, save_token
+from modules.utilities import get_username, build_xtrack, save_token, check_version
 from modules.console import console
 
 class Creator():
@@ -134,6 +134,7 @@ class Creator():
             else:
                 Creator().register(proxy)
 def main():
+    check_version
     console.information("Checking config...")
     config = yaml.safe_load(open("config.yml"))
     if config["captcha"]["key"] == '':
