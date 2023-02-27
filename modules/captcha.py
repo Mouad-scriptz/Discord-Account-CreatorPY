@@ -1,5 +1,5 @@
 import requests, yaml
-from modules.better_print import fail, success
+from modules.console import console
 config = yaml.safe_load(open("config.yml"))
 key = config["captcha"]["key"]
 service = config["captcha"]["provider"]
@@ -9,10 +9,10 @@ def get_balance():
         if r.json().get("balance"):
             return r.json()["balance"]
         else:
-            fail("Failed to get captcha balance")
+            console.failure("Failed to get captcha balance")
             return "0"
     except:
-        fail("Failed to get captcha balance")
+        console.failure("Failed to get captcha balance")
         return "0"
 def get_captcha_key(proxy,ua):
     # Creating a task
@@ -31,11 +31,11 @@ def get_captcha_key(proxy,ua):
         if r.json().get("taskId"):
             taskid = r.json()["taskId"]
         else:
-            fail("Couldn't retrieve captcha task id")
+            console.failure("Couldn't retrieve captcha task id")
             input("Press ENTER to exit.")
             exit(0)
     except:
-        fail("Couldn't retrieve captcha task id")
+        console.failure("Couldn't retrieve captcha task id")
         input("Press ENTER to exit.")
         exit(0)
     # Waiting for results
@@ -43,8 +43,8 @@ def get_captcha_key(proxy,ua):
         try:
             r = requests.post(f"https://api.{service}/getTaskResult",json={"clientKey":key,"taskId":taskid})
             if r.json()["status"] == "ready":
-                success("Solved captcha",r.json()["solution"]["gRecaptchaResponse"][:40])
+                console.success("Solved captcha",r.json()["solution"]["gRecaptchaResponse"][:40])
                 return r.json()["solution"]["gRecaptchaResponse"]
         except:
-            fail("Failed to get captcha status.")
+            console.failure("Failed to get captcha status.")
             return ""
