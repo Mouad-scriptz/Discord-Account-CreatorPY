@@ -29,7 +29,7 @@ class Creator():
 
     def register(self, proxy=None):
         session = self.session
-        if proxy:
+        if proxy != None:
            session.proxies.update({ # I dont know why i used update xD
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
