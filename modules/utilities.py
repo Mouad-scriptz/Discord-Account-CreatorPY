@@ -49,6 +49,7 @@ def build_xtrack(ua,fv):
         "client_event_source":None
     },separators=(",",":"))
     return base64.b64encode(_json.encode()).decode()
+
 def build_oc():
     data = {
         'isIABGlobal': 'false',
@@ -59,6 +60,7 @@ def build_oc():
         'groups': 'C0001:1,C0002:1,C0003:1'
     }
     return urlencode(data)
+
 open_lock = threading.Lock()
 def save_token(token, isvalid):
     open_lock.acquire()
