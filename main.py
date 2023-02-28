@@ -167,13 +167,14 @@ def main():
         answer = input("(#) Continue anyway? (Y/N) >> ")
         if answer.lower() == "n":
             exit(0)
-    os.system("cls || clear")
+    console.clear()
     threads = console.input("Threads")
     try:
         if int(threads) > 0:
             threads = int(threads)
     except:
         console.error("Unvalid input.")
+    console.clear()
     for _ in range(threads):
         threading.Thread(target=Creator().register,args=(proxy,)).start()
 main()

@@ -1,5 +1,5 @@
 import requests, yaml
-from console import console
+from modules.console import console
 config = yaml.safe_load(open("config.yml"))
 key = config["captcha"]["key"]
 service = config["captcha"]["provider"]
