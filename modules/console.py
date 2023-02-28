@@ -1,4 +1,4 @@
-import threading
+import threading, os
 from colorama import Fore, init
 
 init(convert=True)
@@ -41,3 +41,5 @@ class console():
                 f"({Fore.LIGHTCYAN_EX}~{Fore.RESET}) {Fore.CYAN}{text}{Fore.RESET} >> " 
             )
         return data
+    def clear(): # ONLY FOR WINDOWS
+        os.system("cls")
