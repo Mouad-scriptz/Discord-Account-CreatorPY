@@ -41,7 +41,6 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxy"] = proxy 
         payload["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
-    print(r.text)
     try:
         if r.json().get("taskId"):
             taskid = r.json()["taskId"]
