@@ -1,4 +1,4 @@
-# Discord-Account-CreatorPY
+# Discord Token/Account Creator/Generator
 (open-source) (WIP) The revive of discord token generators, with latest discord patches including tls fingerprinting
 
 # Features
