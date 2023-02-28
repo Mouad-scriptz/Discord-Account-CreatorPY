@@ -38,7 +38,7 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyPassword"] = password
     else:
         payload["task"]["type"] = "HCaptchaEnterpriseTask"
-        payload["proxy"] = proxy 
+        payload["task"]["proxy"] = proxy 
         payload["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
     print(r.text)
