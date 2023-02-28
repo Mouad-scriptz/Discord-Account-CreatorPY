@@ -1,11 +1,12 @@
 import requests, yaml
-from modules.console import console
+from console import console
 config = yaml.safe_load(open("config.yml"))
 key = config["captcha"]["key"]
 service = config["captcha"]["provider"]
 def get_balance():
     try:
         r = requests.post(f"https://api.{service}/getBalance",json={"clientKey":key})
+        print(r.text)
         if r.json().get("balance"):
             return r.json()["balance"]
         else:
@@ -18,15 +19,29 @@ def get_captcha_key(ua,proxy):
     # Creating a task
     payload = {
         "clientKey":key,
-        "task":{
-            "type": "HCaptchaEnterpriseTask",
-            "websiteURL": "https://discord.com/",
-            "websiteKey": config["captcha"]["site_key"],
-            "proxy": proxy,
-            "userAgent": ua
-        },
+        "task":
+        {
+            "websiteURL":"https://discord.com/",
+            "websiteKey":config["captcha"]["site_key"],
+        }
     }
+    if service == "capmonster.cloud":
+        payload["task"]["type"] = "HCaptchaTask"
+        payload["task"]["proxyType"] = "http"
+        address = proxy.split("@")[1].split(":")[0]
+        port = int(proxy.split("@")[1].split(":")[1])
+        username = proxy.split(":")[0]
+        password = proxy.split(":")[1].split("@")[0]
+        payload["task"]["proxyAddress"] = address
+        payload["task"]["proxyPort"] = port 
+        payload["task"]["proxyLogin"] = username
+        payload["task"]["proxyPassword"] = password
+    else:
+        payload["task"]["type"] = "HCaptchaEnterpriseTask"
+        payload["proxy"] = proxy 
+        payload["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
+    print(r.text)
     try:
         if r.json().get("taskId"):
             taskid = r.json()["taskId"]
