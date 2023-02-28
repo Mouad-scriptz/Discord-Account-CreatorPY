@@ -162,7 +162,7 @@ def main():
         input("Press ENTER to exit.")
         exit(0)
     console.information("Checking captcha key...")
-    if not int(get_balance()) >= .1: # capsolver.com/getbalance currently down
+    if not float(get_balance()) >= .1: # capsolver.com/getbalance currently down
         console.error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
         answer = input("(#) Continue anyway? (Y/N) >> ")
         if answer.lower() == "n":
