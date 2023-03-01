@@ -17,7 +17,7 @@ def requestBuildNumber():
 
     return discord_build_num
 
-if config["settings"]["discord_build_number"] == "": # automatically requests the Build Number
+if config["settings"]["discord_build_number"] == "": # automatically requests Discord's Build Number
     build_num = requestBuildNumber()
 else:
     build_num = config["settings"]["discord_build_number"]
