@@ -1,10 +1,27 @@
-import requests, random, json, base64, pytz, yaml, threading
+import requests, random, json, base64, pytz, yaml, threading, re
 from datetime import datetime
 from urllib.parse import urlencode
 from modules.console import console
 
 config = yaml.safe_load(open("config.yml"))
-build_num = config["settings"]["discord_build_number"]
+
+
+def requestBuildNumber():
+    res = requests.get("https://discord.com/login")
+    discord_login_page_exploration = res.text
+    file_with_build_num = 'https://discord.com/assets/' + \
+                            re.compile(r'assets/+([a-z0-9]+)\.js').findall(discord_login_page_exploration)[-2] + '.js'
+    req_file_build = requests.get(file_with_build_num).text
+    index_of_build_num = req_file_build.find('buildNumber') + 24
+    discord_build_num = int(req_file_build[index_of_build_num:index_of_build_num + 6])
+
+    return discord_build_num
+
+if config["settings"]["discord_build_number"] == "": # automatically requests Discord's Build Number
+    build_num = requestBuildNumber()
+else:
+    build_num = config["settings"]["discord_build_number"]
+
 def get_username():
     names = requests.post(
         "https://www.spinxo.com/services/NameService.asmx/GetNames",
