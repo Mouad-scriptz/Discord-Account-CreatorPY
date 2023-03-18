@@ -37,6 +37,7 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyLogin"] = username
         payload["task"]["proxyPassword"] = password
     else:
+        payload["appId"] = "942A346E-6C5A-4AE8-B2DE-24E6F9444EA4"
         payload["task"]["type"] = "HCaptchaEnterpriseTask"
         payload["task"]["proxy"] = proxy 
         payload["userAgent"] = ua
