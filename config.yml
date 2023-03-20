@@ -5,7 +5,7 @@ captcha:
 
 settings:
   rotating-proxy: "" # username:password@host:port
-  discord_build_number: ""
+  discord_build_number: "" # leave empty to automate
 
 token:
   username: "" # Leave empty for random
