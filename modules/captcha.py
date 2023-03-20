@@ -47,11 +47,11 @@ def get_captcha_key(ua,proxy):
             taskid = r.json()["taskId"]
         else:
             console.failure("Couldn't retrieve captcha task id")
-            input("Press ENTER to exit.")
+            input("(E) Press ENTER to exit.")
             exit(0)
     except:
         console.failure("Couldn't retrieve captcha task id")
-        input("Press ENTER to exit.")
+        input("(E) Press ENTER to exit.")
         exit(0)
     # Waiting for results
     while True:
