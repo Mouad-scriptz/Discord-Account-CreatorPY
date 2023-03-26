@@ -14,11 +14,15 @@ class Creator():
             header_order=["accept","accept-encoding","accept-language","user-agent"],
             random_tls_extension_order=True
         )
-
+        self.headers={
+            'authority': "discord.com",
+            'sec-ch-ua': f"\"Chromium\";v=\"{str(self.chrome_v)}\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"{str(self.chrome_v)}\"",
+            "user-agent": self.ua
+        }
     def register(self, proxy=None):
         session = self.session
         if proxy != None:
-           session.proxies.update({ # I dont know why i used update xD
+           session.proxies.update({
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
             })
@@ -27,15 +31,13 @@ class Creator():
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "en-US",
-            "sec-ch-ua": f"\"Chromium\";v=\"{str(self.chrome_v)}\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"{str(self.chrome_v)}\"",
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "\"Windows\"",
             "sec-fetch-dest": "document",
             "sec-fetch-mode": "navigate",
             "sec-fetch-site": "none",
             "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            "user-agent": self.ua
+            "upgrade-insecure-requests": "1"
         }
         r = session.get("https://discord.com/",headers=headers)
         cookies_dict = r.cookies.get_dict()
@@ -45,19 +47,15 @@ class Creator():
             "accept": "*/*",
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "en-US",
-            "cookie": f'__dcfduid={cookies_dict["__dcfduid"]}; __sdcfduid={cookies_dict["__sdcfduid"]}; __cfruid={cookies_dict["__cfruid"]}; ',
             "referer": "https://discord.com/",
-            "sec-ch-ua": f"\"Chromium\";v=\"{str(self.chrome_v)}\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"{str(self.chrome_v)}\"",
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "\"Windows\"",
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            "user-agent": self.ua,
             "x-track": build_xtrack(self.ua,self.full_chrome_v)
         }
-        cookies = {"__dcfduid":cookies_dict["__dcfduid"],"__sdcfduid":cookies_dict["__sdcfduid"],"__cfruid":cookies_dict["__cfruid"]}
-        r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies)
+        r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
         try:
             fingerprint = r.json()["fingerprint"]
         except:
@@ -70,12 +68,26 @@ class Creator():
             username = config["token"]["username"]
         else:
             username = get_username()
+
+        headers = {
+            'accept': '*/*',
+            'accept-language': 'en-US',
+            'origin': 'https://discord.com',
+            'referer': 'https://discord.com/',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'x-fingerprint': fingerprint,
+            'x-track': build_xtrack(self.ua,self.full_chrome_v),
+        }
         payload = {
             "consent": "true",
             "fingerprint": fingerprint,
             "username": username,
         }
-        r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies)
+        r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
 
         if r.status_code == 400:
             # Register try final
@@ -86,14 +98,14 @@ class Creator():
                 "captcha_key": get_captcha_key(self.ua,proxy)
             }
 
-            r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies)
+            r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
             try:
                 token = r.json()["token"]
             except:
                 Creator().register(proxy)
                 
             try:
-                r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
+                r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
             except:
                 console.content("Generated UNKNOWN token",token)
                 save_token(token, False)
@@ -108,7 +120,7 @@ class Creator():
             if r.json().get("token"):
                 token = r.json()["token"]
                 try:
-                    r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies)
+                    r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
                 except:
                     console.content("Generated UNKNOWN token",token)
                     save_token(token, False)
