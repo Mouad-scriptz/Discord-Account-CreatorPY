@@ -38,7 +38,7 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyPassword"] = password
     else:
         payload["appId"] = "942A346E-6C5A-4AE8-B2DE-24E6F9444EA4"
-        payload["task"]["type"] = "HCaptchaEnterpriseTask"
+        payload["task"]["type"] = "HCaptchaTurboTask"
         payload["task"]["proxy"] = proxy 
         payload["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
@@ -47,12 +47,10 @@ def get_captcha_key(ua,proxy):
             taskid = r.json()["taskId"]
         else:
             console.failure("Couldn't retrieve captcha task id")
-            input("(E) Press ENTER to exit.")
-            exit(0)
+            return ""
     except:
         console.failure("Couldn't retrieve captcha task id")
-        input("(E) Press ENTER to exit.")
-        exit(0)
+        return ""
     # Waiting for results
     while True:
         try:
