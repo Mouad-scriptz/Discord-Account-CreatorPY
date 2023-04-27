@@ -19,8 +19,7 @@ def get_captcha_key(ua,proxy):
     # Creating a task
     payload = {
         "clientKey":key,
-        "task":
-        {
+        "task": {
             "websiteURL":"https://discord.com/",
             "websiteKey":config["captcha"]["site_key"],
         }
@@ -36,11 +35,11 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyPort"] = port 
         payload["task"]["proxyLogin"] = username
         payload["task"]["proxyPassword"] = password
-    else:
+    elif service == "capsolver.com":
         payload["appId"] = "942A346E-6C5A-4AE8-B2DE-24E6F9444EA4"
         payload["task"]["type"] = "HCaptchaTurboTask"
         payload["task"]["proxy"] = proxy 
-        payload["userAgent"] = ua
+        payload["task"]["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
     try:
         if r.json().get("taskId"):
