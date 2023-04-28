@@ -21,7 +21,7 @@ def get_captcha_key(ua,proxy):
         "clientKey":key,
         "task": {
             "websiteURL":"https://discord.com/",
-            "websiteKey":config["captcha"]["site_key"],
+            "websiteKey":config["captcha"]["site key"],
         }
     }
     if service == "capmonster.cloud":
