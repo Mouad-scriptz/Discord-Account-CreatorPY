@@ -15,14 +15,13 @@ def get_balance():
     except:
         console.failure("Failed to get captcha balance")
         return "0"
-
 def get_captcha_key(ua,proxy):
     # Creating a task
     payload = {
-        "clientKey": key,
+        "clientKey":key,
         "task": {
-            "websiteURL": "https://discord.com/",
-            "websiteKey": config['captcha']['site key'],
+            "websiteURL":"https://discord.com/",
+            "websiteKey":config["captcha"]["site_key"],
         }
     }
     if service == "capmonster.cloud":
@@ -36,7 +35,7 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyPort"] = port 
         payload["task"]["proxyLogin"] = username
         payload["task"]["proxyPassword"] = password
-    else:
+    elif service == "capsolver.com":
         payload["appId"] = "942A346E-6C5A-4AE8-B2DE-24E6F9444EA4"
         payload["task"]["type"] = "HCaptchaTurboTask"
         payload["task"]["proxy"] = proxy 
@@ -56,7 +55,6 @@ def get_captcha_key(ua,proxy):
         try:
             r = requests.post(f"https://api.{service}/getTaskResult",json={"clientKey":key,"taskId":taskid})
             if r.json()["status"] == "ready":
-                print(r.text)
                 console.success("Solved captcha",r.json()["solution"]["gRecaptchaResponse"][:40])
                 return r.json()["solution"]["gRecaptchaResponse"]
         except:
