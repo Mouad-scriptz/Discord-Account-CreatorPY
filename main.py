@@ -44,16 +44,20 @@ class Creator():
 
         # Getting fingerprint
         headers = {
+            'authority': 'discord.com',
             'accept': '*/*',
             'accept-language': 'en-GB,en;q=0.9',
             'referer': 'https://discord.com/',
+            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-origin',
-            'x-track': build_xtrack(self.ua,self.full_chrome_v)
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+            'x-track': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLUdCIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExMi4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTEyLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjk5OTksImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9',
         }
+
         r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
         try:
             fingerprint = r.json()["fingerprint"]
@@ -70,31 +74,39 @@ class Creator():
             username = get_username()
 
         headers = {
+            'authority': 'discord.com',
             'accept': '*/*',
             'accept-language': 'en-GB,en;q=0.9',
             'content-type': 'application/json',
             'origin': 'https://discord.com',
             'referer': 'https://discord.com/',
+            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': '"Windows"',
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-origin',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
             'x-fingerprint': fingerprint,
-            'x-track': build_xtrack(self.ua,self.full_chrome_v)
+            'x-track': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLUdCIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExMi4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTEyLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjk5OTksImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9',
         }
         payload = {
             "fingerprint": fingerprint,
-            "consent": "true",
+            "consent": True,
             "username": username
         }
         r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
         if r.status_code == 400:
             # Register try final
+            while True:
+                captcha = get_captcha_key(self.ua, proxy)
+                if captcha != '':
+                    console.failure("Failed to solve captcha retrying...")
+                    break
             payload = {
-                "captcha_key": get_captcha_key(self.ua,proxy),
+                "captcha_key": captcha,
                 "fingerprint": fingerprint,
-                "consent": "true",
+                "consent": True,
                 "username": username
             }
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
@@ -120,6 +132,7 @@ class Creator():
                 token = r.json()["token"]
                 try:
                     r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
+                    
                 except:
                     console.content("Generated UNKNOWN token",token)
                     save_token(token, False)
@@ -144,18 +157,18 @@ def main():
         console.error("Unvalid captcha provider detected in config.yml (%s)".format(config["captcha"]["provider"]))
         input("Press ENTER to exit.")
         exit(0)
-    if config["settings"]["rotating-proxy"] == '':
+    if config["settings"]["rotating proxy"] == '':
         console.error("No proxy detected in config.yml")
         input("Press ENTER to exit.")
         exit(0)
     console.information("Checking proxy...")
     try:
         proxies = {
-            "http": "http://"+config["settings"]["rotating-proxy"],
-            "https": "http://"+config["settings"]["rotating-proxy"]
+            "http": "http://"+config["settings"]["rotating proxy"],
+            "https": "http://"+config["settings"]["rotating proxy"]
         }
         requests.get("https://www.google.com/",proxies=proxies,timeout=3)
-        proxy = config["settings"]["rotating-proxy"]
+        proxy = config["settings"]["rotating proxy"]
     except:
         console.error("Unvalid proxy")
         input("(E) Press ENTER to exit.")
