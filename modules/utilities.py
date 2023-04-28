@@ -17,10 +17,10 @@ def request_build_number():
 
     return discord_build_num
 
-if config["settings"]["discord_build_number"] == "": # automatically requests Discord's Build Number
+if config["settings"]["discord build number"] == "": # automatically requests Discord's Build Number
     build_num = request_build_number()
 else:
-    build_num = config["settings"]["discord_build_number"]
+    build_num = config["settings"]["discord build number"]
 
 def get_username():
     names = requests.post(
