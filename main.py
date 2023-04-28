@@ -5,9 +5,9 @@ from modules.console import console
 
 class Creator():
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
-        self.chrome_v = 110
-        self.full_chrome_v = "110.0.0.0"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+        self.chrome_v = 112
+        self.full_chrome_v = "112.0.0.0"
         self.session = tls_client.Session( 
             f"chrome_{str(self.chrome_v)}",
             pseudo_header_order=[":authority",":method",":path",":scheme"],
@@ -16,7 +16,7 @@ class Creator():
         )
         self.headers={
             'authority': "discord.com",
-            'sec-ch-ua': f"\"Chromium\";v=\"{str(self.chrome_v)}\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"{str(self.chrome_v)}\"",
+            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
             "user-agent": self.ua
         }
     def register(self, proxy=None):
@@ -44,20 +44,20 @@ class Creator():
 
         # Getting fingerprint
         headers = {
-            "accept": "*/*",
-            "accept-encoding": "gzip, deflate, br",
-            "accept-language": "en-US",
-            "referer": "https://discord.com/",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "x-track": build_xtrack(self.ua,self.full_chrome_v)
+            'accept': '*/*',
+            'accept-language': 'en-GB,en;q=0.9',
+            'referer': 'https://discord.com/',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'x-track': build_xtrack(self.ua,self.full_chrome_v)
         }
         r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
         try:
             fingerprint = r.json()["fingerprint"]
+            console.success("Got fingerprint",fingerprint)
         except:
             console.failure("Failed to retrieve fingerprint.")
             Creator().register(proxy)
@@ -71,7 +71,8 @@ class Creator():
 
         headers = {
             'accept': '*/*',
-            'accept-language': 'en-US',
+            'accept-language': 'en-GB,en;q=0.9',
+            'content-type': 'application/json',
             'origin': 'https://discord.com',
             'referer': 'https://discord.com/',
             'sec-ch-ua-mobile': '?0',
@@ -80,24 +81,22 @@ class Creator():
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-origin',
             'x-fingerprint': fingerprint,
-            'x-track': build_xtrack(self.ua,self.full_chrome_v),
+            'x-track': build_xtrack(self.ua,self.full_chrome_v)
         }
         payload = {
-            "consent": "true",
             "fingerprint": fingerprint,
-            "username": username,
+            "consent": "true",
+            "username": username
         }
         r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
-
         if r.status_code == 400:
             # Register try final
             payload = {
-                "consent": "true",
+                "captcha_key": get_captcha_key(self.ua,proxy),
                 "fingerprint": fingerprint,
-                "username": username,
-                "captcha_key": get_captcha_key(self.ua,proxy)
+                "consent": "true",
+                "username": username
             }
-
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
             try:
                 token = r.json()["token"]
@@ -162,7 +161,7 @@ def main():
         input("(E) Press ENTER to exit.")
         exit(0)
     console.information("Checking captcha key...")
-    if not float(get_balance()) >= .1: # capsolver.com/getbalance currently down
+    if not float(get_balance()) >= .1:
         console.error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
         answer = input("(#) Continue anyway? (Y/N) >> ")
         if answer.lower() == "n":
@@ -177,4 +176,5 @@ def main():
     console.clear()
     for _ in range(threads):
         threading.Thread(target=Creator().register,args=(proxy,)).start()
-main()
+if __name__ == "__main__":
+    main()
