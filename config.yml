@@ -1,11 +1,11 @@
 captcha:
   key: ""
   provider: "capsolver.com" # Or capmonster.cloud, more soon
-  site_key: "4c672d35-0701-42b2-88c3-78380b0db560" # Changes 1-2 times a year
+  site key: "4c672d35-0701-42b2-88c3-78380b0db560" # Changes 1-2 times a year
 
 settings:
-  rotating-proxy: "" # username:password@host:port
-  discord_build_number: "" # leave empty to automate
+  rotating proxy: "" # username:password@host:port
+  discord build number: "" # leave empty to automate
 
 token:
   username: "" # Leave empty for random
