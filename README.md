@@ -1,10 +1,10 @@
 # Discord Token/Account Creator/Generator
-(open-source) (WIP) The revive of discord token generators, with latest discord patches including tls fingerprinting
+(Open-Source) (WIP) The revive of discord token generators, with latest discord patches using tls fingerprinting
 
 # Features
 + Threading
 + Rotating proxies
-+ Realistic names
++ Realistic usernames (api)
 + ~ More soon
 
 # Setup
