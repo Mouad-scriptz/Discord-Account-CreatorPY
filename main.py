@@ -5,9 +5,9 @@ from modules.console import console
 
 class Creator():
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-        self.chrome_v = 112
-        self.full_chrome_v = "112.0.0.0"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+        self.chrome_v = 114
+        self.full_chrome_v = "114.0.0.0"
         self.session = tls_client.Session( 
             f"chrome_{str(self.chrome_v)}",
             pseudo_header_order=[":authority",":method",":path",":scheme"],
@@ -16,8 +16,8 @@ class Creator():
         )
         self.headers={
             'authority': "discord.com",
-            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
-            "user-agent": self.ua
+            'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            "User-Agent": self.ua
         }
     def register(self, proxy=None):
         session = self.session
@@ -26,38 +26,34 @@ class Creator():
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
             })
+           
         # Getting cookies
         headers = {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "accept-encoding": "gzip, deflate, br",
-            "accept-language": "en-US",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "none",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1"
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1'
         }
         r = session.get("https://discord.com/",headers=headers)
         cookies_dict = r.cookies.get_dict()
 
         # Getting fingerprint
         headers = {
-            'authority': 'discord.com',
-            'accept': '*/*',
-            'accept-language': 'en-GB,en;q=0.9',
-            'referer': 'https://discord.com/',
-            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
-            'x-track': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLUdCIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExMi4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTEyLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjk5OTksImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://discord.com/',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'X-Track': build_xtrack(self.ua, self.full_chrome_v)
         }
-
         r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
         try:
             fingerprint = r.json()["fingerprint"]
@@ -66,85 +62,55 @@ class Creator():
             console.failure("Failed to retrieve fingerprint.")
             Creator().register(proxy)
 
-        # Register try 1
+        # Register
         config = yaml.safe_load(open("config.yml"))
         if config["token"]["username"] != '':
             username = config["token"]["username"]
         else:
             username = get_username()
-
         headers = {
-            'authority': 'discord.com',
-            'accept': '*/*',
-            'accept-language': 'en-GB,en;q=0.9',
-            'content-type': 'application/json',
-            'origin': 'https://discord.com',
-            'referer': 'https://discord.com/',
-            'sec-ch-ua': '"Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
-            'x-fingerprint': fingerprint,
-            'x-track': 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLUdCIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExMi4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTEyLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjk5OTksImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Origin': 'https://discord.com',
+            'Referer': 'https://discord.com/',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'X-Fingerprint': fingerprint,
+            'X-Track': build_xtrack(self.ua, self.full_chrome_v)
         }
+        while True:
+            captcha = get_captcha_key(self.ua, proxy)
+            if captcha == '':
+                console.failure("Failed to solve captcha, retrying...")
+            else:
+                break
         payload = {
+            "captcha_key": captcha,
             "fingerprint": fingerprint,
             "consent": True,
             "username": username
         }
         r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
-        if r.status_code == 400:
-            # Register try final
-            while True:
-                captcha = get_captcha_key(self.ua, proxy)
-                if captcha != '':
-                    console.failure("Failed to solve captcha retrying...")
-                    break
-            payload = {
-                "captcha_key": captcha,
-                "fingerprint": fingerprint,
-                "consent": True,
-                "username": username
-            }
-            r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
-            try:
-                token = r.json()["token"]
-            except:
-                Creator().register(proxy)
-                
-            try:
-                r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
-            except:
-                console.content("Generated UNKNOWN token",token)
-                save_token(token, False)
-            if r.status_code != 403:
-                console.content("Generated UNLOCKED token",token)
-                save_token(token, True)
-            else:
-                console.content("Generated LOCKED token",token)
-                save_token(token, False)
+        try:
+            token = r.json()["token"]
+        except:
             Creator().register(proxy)
+        try:
+            r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
+        except:
+            console.content("Generated UNKNOWN token",token)
+            save_token(token, False)
+        if r.status_code != 403:
+            console.content("Generated UNLOCKED token",token)
+            save_token(token, True)
         else:
-            if r.json().get("token"):
-                token = r.json()["token"]
-                try:
-                    r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
-                    
-                except:
-                    console.content("Generated UNKNOWN token",token)
-                    save_token(token, False)
-                if r.status_code != 403:
-                    console.content("Generated UNLOCKED token",token)
-                    save_token(token, True)
-                else:
-                    console.content("Generated LOCKED token",token)
-                    save_token(token, False)
-                Creator().register(proxy)
-            else:
-                Creator().register(proxy)
+            console.content("Generated LOCKED token",token)
+            save_token(token, False)
+        Creator().register(proxy)
+
 def main():
     check_version
     console.information("Checking config...")
