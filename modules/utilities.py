@@ -54,7 +54,7 @@ def build_xtrack(ua,fv):
         "os":"Windows",
         "browser":"Chrome",
         "device":"",
-        "system_locale":"en-GB",
+        "system_locale":"en-US",
         "browser_user_agent":ua,
         "browser_version":fv,
         "os_version":"10",
