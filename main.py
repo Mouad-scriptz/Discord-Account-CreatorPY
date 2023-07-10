@@ -54,8 +54,8 @@ class Creator():
             'Sec-Fetch-Site': 'same-origin',
             'X-Track': build_xtrack(self.ua, self.full_chrome_v)
         }
-        r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
         try:
+            r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
             fingerprint = r.json()["fingerprint"]
             console.success("Got fingerprint",fingerprint)
         except:
@@ -93,8 +93,8 @@ class Creator():
             "consent": True,
             "username": username
         }
-        r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
         try:
+            r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
             token = r.json()["token"]
         except:
             Creator().register(proxy)
