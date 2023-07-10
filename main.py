@@ -21,7 +21,7 @@ class Creator():
         }
     def register(self, proxy=None):
         session = self.session
-        if proxy != None:
+        if proxy is not None:
            session.proxies.update({
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
@@ -136,7 +136,7 @@ def main():
         requests.get("https://www.google.com/",proxies=proxies,timeout=3)
         proxy = config["settings"]["rotating proxy"]
     except:
-        console.error("Unvalid proxy")
+        console.error("Unvalid/Slow proxy")
         input("(E) Press ENTER to exit.")
         exit(0)
     console.information("Checking captcha key...")
