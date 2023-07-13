@@ -9,7 +9,6 @@ def print_with_lock(text):
     print(text)
     print_lock.release()
 
-
 class console():
     def information(text):
         print_with_lock(
