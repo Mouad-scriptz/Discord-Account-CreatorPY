@@ -9,7 +9,7 @@
 ~ More soon
 
 # Setup
-1. Put your [capsolver.com](https://dashboard.capsolver.com/passport/register?inviteCode=4BS2uGc_L_Tw) key and proxies [iproyal.com](https://iproyal.com?r=mouadscriptz) in config.yml
+1. Put your [capsolver.com](https://dashboard.capsolver.com/passport/register?inviteCode=4BS2uGc_L_Tw) key and proxies [iproyal.com](https://iproyal.com?r=dtg) in config.yml
 2. Run install.py
 3. Run main.py
 
