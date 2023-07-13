@@ -3,12 +3,13 @@
 
 # Features
 + Threading
-+ Rotating proxies
++ Static proxies
 + Realistic usernames (api)
-+ ~ More soon
++ Generates unlocked tokens
+~ More soon
 
 # Setup
-1. Put your [capsolver.com](https://dashboard.capsolver.com/passport/register?inviteCode=4BS2uGc_L_Tw) and rotating-proxy (or other) key in config.yml
+1. Put your [capsolver.com](https://dashboard.capsolver.com/passport/register?inviteCode=4BS2uGc_L_Tw) key and proxies [iproyal.com](https://iproyal.com?r=mouadscriptz) in config.yml
 2. Run install.py
 3. Run main.py
 
