@@ -1,4 +1,4 @@
-import yaml, threading, tls_client, requests
+import yaml, threading, tls_client, requests, tls_client.exceptions, json, time, itertools
 from modules.captcha import get_balance, get_captcha_key
 from modules.utilities import get_username, build_xtrack, save_token, check_version
 from modules.console import console
@@ -15,10 +15,11 @@ class Creator():
             random_tls_extension_order=True
         )
         self.headers={
-            'authority': "discord.com",
+            'Authority': "discord.com",
             'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-            "User-Agent": self.ua
+            'User-Agent': self.ua
         }
+
     def register(self, proxy=None):
         session = self.session
         if proxy is not None:
@@ -39,9 +40,19 @@ class Creator():
             'Sec-Fetch-User': '?1',
             'Upgrade-Insecure-Requests': '1'
         }
-        r = session.get("https://discord.com/",headers=headers)
-        cookies_dict = r.cookies.get_dict()
-
+        try:
+            r = session.get("https://discord.com/",headers=headers)
+            cookies_dict = r.cookies.get_dict()
+            console.success("Got cookies",len(cookies_dict))
+        except tls_client.exceptions.TLSClientExeption:
+            console.error("Failed to retrieve cookies, tls exception.")
+            return
+        except json.decoder.JSONDecodeError:
+            console.error("Failed to retrieve cookies, invalid response.")
+            return
+        except:
+            console.error("Failed to retrieve cookies, unknown error.")
+            return
         # Getting fingerprint
         headers = {
             'Accept': '*/*',
@@ -58,10 +69,15 @@ class Creator():
             r = session.get("https://discord.com/api/v9/experiments",headers=headers,cookies=cookies_dict)
             fingerprint = r.json()["fingerprint"]
             console.success("Got fingerprint",fingerprint)
+        except tls_client.exceptions.TLSClientExeption:
+            console.error("Failed to retrieve fingerprint, tls exception.")
+            return
+        except json.decoder.JSONDecodeError:
+            console.error("Failed to retrieve fingerprint, invalid response.")
+            return
         except:
-            console.failure("Failed to retrieve fingerprint.")
-            Creator().register(proxy)
-
+            console.error("Failed to retrieve fingerprint, unknown error.")
+            return
         # Register
         config = yaml.safe_load(open("config.yml"))
         if config["token"]["username"] != '':
@@ -81,12 +97,16 @@ class Creator():
             'X-Fingerprint': fingerprint,
             'X-Track': build_xtrack(self.ua, self.full_chrome_v)
         }
-        while True:
+        tries = 0
+        while tries <= 3:
             captcha = get_captcha_key(self.ua, proxy)
             if captcha == '':
-                console.failure("Failed to solve captcha, retrying...")
+                tries += 1
+                console.failure(f"Failed to solve captcha, retrying... ({tries})")
             else:
                 break
+        if tries == 3:
+            return
         payload = {
             "captcha_key": captcha,
             "fingerprint": fingerprint,
@@ -96,13 +116,29 @@ class Creator():
         try:
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
             token = r.json()["token"]
+        except tls_client.exceptions.TLSClientExeption:
+            console.error("Failed to register, tls exception.")
+            return
+        except json.decoder.JSONDecodeError:
+            console.error("Failed to register, invalid response.")
+            return
         except:
-            Creator().register(proxy)
+            console.error("Failed to check token, unknown error.")
+            return
         try:
             r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
+        except tls_client.exceptions.TLSClientExeption:
+            console.error("Failed to check token, tls exception.")
+            save_token(token, True)
+            return
+        except json.decoder.JSONDecodeError:
+            console.error("Failed to check token, invalid response.")
+            save_token(token, True)
+            return
         except:
-            console.content("Generated UNKNOWN token",token)
-            save_token(token, False)
+            console.error("Failed to check token, unknown error.")
+            save_token(token, True)
+            return
         if r.status_code != 403:
             console.content("Generated UNLOCKED token",token)
             save_token(token, True)
@@ -111,8 +147,15 @@ class Creator():
             save_token(token, False)
         Creator().register(proxy)
 
+def thread(proxies):
+    while True:
+        try:
+            proxy = next(proxies)
+            Creator().register(proxy)
+        except:
+            pass
 def main():
-    check_version
+    check_version()
     console.information("Checking config...")
     config = yaml.safe_load(open("config.yml"))
     if config["captcha"]["key"] == '':
@@ -120,24 +163,13 @@ def main():
         input("Press ENTER to exit.")
         exit(0)
     if not config["captcha"]["provider"] in ["capmonster.cloud", "capsolver.com", "anti-captcha.com"]:
-        console.error("Unvalid captcha provider detected in config.yml (%s)".format(config["captcha"]["provider"]))
+        console.error("Invalid captcha provider detected in config.yml ({config['captcha']['provider']})")
         input("Press ENTER to exit.")
         exit(0)
-    if config["settings"]["rotating proxy"] == '':
-        console.error("No proxy detected in config.yml")
+    proxies = open("proxies.txt").read().splitlines()
+    if len(proxies) == 0:
+        console.error("No proxies detected in proxies.txt")
         input("Press ENTER to exit.")
-        exit(0)
-    console.information("Checking proxy...")
-    try:
-        proxies = {
-            "http": "http://"+config["settings"]["rotating proxy"],
-            "https": "http://"+config["settings"]["rotating proxy"]
-        }
-        requests.get("https://www.google.com/",proxies=proxies,timeout=3)
-        proxy = config["settings"]["rotating proxy"]
-    except:
-        console.error("Unvalid/Slow proxy")
-        input("(E) Press ENTER to exit.")
         exit(0)
     console.information("Checking captcha key...")
     if not float(get_balance()) >= .1:
@@ -147,13 +179,15 @@ def main():
             exit(0)
     console.clear()
     threads = console.input("Threads")
-    try:
-        if int(threads) > 0:
-            threads = int(threads)
+    try: 
+        if int(threads) > 0: threads = int(threads)
     except:
-        console.error("Unvalid input.")
+        console.error("Invalid input.")
+        time.sleep(2)
+        main()
     console.clear()
+    proxies = itertools.cycle(proxies)
     for _ in range(threads):
-        threading.Thread(target=Creator().register,args=(proxy,)).start()
+        threading.Thread(target=thread,args=(proxies,)).start()
 if __name__ == "__main__":
     main()
