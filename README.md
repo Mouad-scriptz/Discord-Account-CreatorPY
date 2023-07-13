@@ -14,7 +14,7 @@
 
 # Support
 + Discord server: https://discord.gg/Tct8fUVnZm
-+ My discord: mouad5
++ My discord: mouad_.
 
 # Preview
 ![](https://cdn.discordapp.com/attachments/1077576500355809323/1077689292702367754/image.png)
