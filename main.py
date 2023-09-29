@@ -40,7 +40,7 @@ class Creator():
 
     def register(self, proxy=None):
         session = self.session
-        if proxy != False:
+        if proxy:
            session.proxies = {
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
