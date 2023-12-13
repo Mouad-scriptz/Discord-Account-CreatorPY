@@ -5,7 +5,6 @@ from modules.console import console
 
 config = yaml.safe_load(open("config.yml"))
 
-
 def request_build_number():
     text = requests.get("https://discord.com/login").text 
     script_url = 'https://discord.com/assets/' + re.compile(r'\d+\.\w+\.js|sentry\.\w+\.js').findall(text)[-1]
