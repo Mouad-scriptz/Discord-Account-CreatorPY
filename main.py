@@ -1,4 +1,22 @@
-import yaml, threading, tls_client, requests, tls_client.exceptions, json, time, itertools
+# I know this can be better
+import pkg_resources, os, time
+installed = 0
+uninstalled = 0
+command = "pip install "
+for lib in ['tls-client','requests','colorama','pytz','pyyaml','datetime']:
+    try:
+        dist = pkg_resources.get_distribution(lib)
+        installed += 1
+        command = command + lib + " "
+    except pkg_resources.DistributionNotFound:
+        uninstalled += 1
+        command = command + lib + " "
+command = command + " --upgrade"
+print("(I) Installed libraries:",installed)
+print("(I) Libraries to install:",uninstalled)
+os.system(command)
+print("(S) Installed all needed libraries.")
+import yaml, threading, tls_client, tls_client.exceptions, json, itertools
 from modules.captcha import get_balance, get_captcha_key
 from modules.utilities import get_username, build_xtrack, save_token, check_version
 from modules.console import console
@@ -22,11 +40,11 @@ class Creator():
 
     def register(self, proxy=None):
         session = self.session
-        if proxy is not None:
-           session.proxies.update({
+        if proxy:
+           session.proxies = {
                 "http": f"http://{proxy}",
                 "https": f"http://{proxy}"
-            })
+            }
            
         # Getting cookies
         headers = {
@@ -115,6 +133,9 @@ class Creator():
         }
         try:
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)
+            if "invalid-response" in r.text:
+                console.error("Failed to register, invalid captcha.")
+                return 
             token = r.json()["token"]
         except tls_client.exceptions.TLSClientExeption:
             console.error("Failed to register, tls exception.")
@@ -130,7 +151,7 @@ class Creator():
                 console.error(f"Failed to register, {e}.")
             return
         try:
-            r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
+            r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"Authorization":token},cookies=cookies_dict)
         except tls_client.exceptions.TLSClientExeption:
             console.error("Failed to check token, tls exception.")
             save_token(token, True)
@@ -149,7 +170,6 @@ class Creator():
         else:
             console.content("Generated LOCKED token",token)
             save_token(token, False)
-        Creator().register(proxy)
 
 def thread(proxies):
     while True:
@@ -158,6 +178,7 @@ def thread(proxies):
             Creator().register(proxy)
         except:
             pass
+
 def main():
     check_version()
     console.information("Checking config...")
@@ -167,7 +188,7 @@ def main():
         input("Press ENTER to exit.")
         exit(0)
     if not config["captcha"]["provider"] in ["capmonster.cloud", "capsolver.com", "anti-captcha.com"]:
-        console.error("Invalid captcha provider detected in config.yml ({config['captcha']['provider']})")
+        console.error(f"Invalid captcha provider detected in config.yml ({config['captcha']['provider']})")
         input("Press ENTER to exit.")
         exit(0)
     proxies = open("proxies.txt").read().splitlines()
@@ -190,7 +211,7 @@ def main():
         time.sleep(2)
         main()
     console.clear()
-    proxies = itertools.cycle(proxies)
+    proxies = itertools.cycle(open("proxies.txt").read().splitlines())
     for _ in range(threads):
         threading.Thread(target=thread,args=(proxies,)).start()
 if __name__ == "__main__":
