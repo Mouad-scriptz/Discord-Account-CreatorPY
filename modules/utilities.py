@@ -7,15 +7,12 @@ config = yaml.safe_load(open("config.yml"))
 
 
 def request_build_number():
-    res = requests.get("https://discord.com/login")
-    discord_login_page_exploration = res.text
-    file_with_build_num = 'https://discord.com/assets/' + \
-                            re.compile(r'assets/+([a-z0-9]+)\.js').findall(discord_login_page_exploration)[-2] + '.js'
-    req_file_build = requests.get(file_with_build_num).text
-    index_of_build_num = req_file_build.find('buildNumber') + 24
-    discord_build_num = int(req_file_build[index_of_build_num:index_of_build_num + 6])
-
-    return discord_build_num
+    text = requests.get("https://discord.com/login").text 
+    script_url = 'https://discord.com/assets/' + re.compile(r'\d+\.\w+\.js|sentry\.\w+\.js').findall(text)[-1]
+    text = requests.get(script_url).text
+    index = text.find("buildNumber") + 26
+    build_num = int(text[index:index + 6])
+    return build_num
 
 if config["settings"]["discord build number"] == "": # automatically requests Discord's Build Number
     build_num = request_build_number()

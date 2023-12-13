@@ -122,8 +122,12 @@ class Creator():
         except json.decoder.JSONDecodeError:
             console.error("Failed to register, invalid response.")
             return
-        except:
-            console.error("Failed to check token, unknown error.")
+        except Exception as e:
+            if "invalid-response" in r.text or "captcha-required" in r.text:
+                console.error("Failed to register, bad captcha.")
+                print(r.text)
+            else:
+                console.error(f"Failed to register, {e}.")
             return
         try:
             r = session.get("https://discord.com/api/v9/users/@me/affinities/users",headers={"authorization":token},cookies=cookies_dict)
