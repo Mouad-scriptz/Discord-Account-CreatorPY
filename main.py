@@ -13,8 +13,9 @@ for lib in ['tls-client','requests','colorama','pytz','pyyaml','datetime']:
         command = command + lib + " "
 command = command + " --upgrade"
 print("(I) Installed libraries:",installed)
-print("(I) Libraries to install:",uninstalled)
-os.system(command)
+print("(I) Libraries to install:", "None" if uninstalled == 0 else uninstalled)
+if uninstalled > 0:
+    os.system(command)
 print("(S) Installed all needed libraries.")
 import yaml, threading, tls_client, tls_client.exceptions, json, itertools
 from modules.captcha import get_balance, get_captcha_key
@@ -23,9 +24,9 @@ from modules.console import console
 
 class Creator():
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-        self.chrome_v = 114
-        self.full_chrome_v = "114.0.0.0"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        self.chrome_v = 120
+        self.full_chrome_v = "120.0.0.0"
         self.session = tls_client.Session( 
             f"chrome_{str(self.chrome_v)}",
             pseudo_header_order=[":authority",":method",":path",":scheme"],
@@ -34,7 +35,7 @@ class Creator():
         )
         self.headers={
             'Authority': "discord.com",
-            'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
             'User-Agent': self.ua
         }
 
@@ -125,11 +126,13 @@ class Creator():
                 break
         if tries == 3:
             return
+        
         payload = {
-            "captcha_key": captcha,
-            "fingerprint": fingerprint,
-            "consent": True,
-            "username": username
+            'consent': True,
+            'fingerprint': fingerprint,
+            'captcha_key': captcha,
+            'global_name': username,
+            'unique_username_registration': True
         }
         try:
             r = session.post("https://discord.com/api/v9/auth/register",json=payload,headers=headers,cookies=cookies_dict)

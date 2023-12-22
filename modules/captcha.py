@@ -20,12 +20,13 @@ def get_captcha_key(ua,proxy):
     payload = {
         "clientKey":key,
         "task": {
+            "type": "HCaptchaTask",
             "websiteURL":"https://discord.com/",
             "websiteKey":config["captcha"]["site key"],
         }
     }
     if service == "capmonster.cloud":
-        payload["task"]["type"] = "HCaptchaTask"
+        # proxy
         payload["task"]["proxyType"] = "http"
         address = proxy.split("@")[1].split(":")[0]
         port = int(proxy.split("@")[1].split(":")[1])
@@ -37,7 +38,6 @@ def get_captcha_key(ua,proxy):
         payload["task"]["proxyPassword"] = password
     elif service == "capsolver.com":
         payload["appId"] = "942A346E-6C5A-4AE8-B2DE-24E6F9444EA4"
-        payload["task"]["type"] = "HCaptchaTurboTask"
         payload["task"]["proxy"] = proxy 
         payload["task"]["userAgent"] = ua
     r = requests.post(f"https://api.{service}/createTask",json=payload)
